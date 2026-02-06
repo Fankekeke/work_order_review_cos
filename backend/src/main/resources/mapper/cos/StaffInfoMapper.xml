@@ -2,4 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.StaffInfoMapper">
 
+    <!-- 分页获取员工信息 -->
+    <select id="queryPage" resultType="java.util.LinkedHashMap">
+        SELECT
+        si.*,
+        di.dept_name,
+        poi.name as positionName
+        FROM
+        staff_info si
+        left join dept_info di on
+        (di.id = si.dept_id)
+        left join position_info poi on
+        (poi.id = si.position_id)
+        WHERE
+        1 = 1
+        <if test="staffInfo.code != null and staffInfo.code != ''">
+            AND si.code LIKE CONCAT('%', #{staffInfo.code}, '%')
+        </if>
+        <if test="staffInfo.name != null and staffInfo.name != ''">
+            AND si.name LIKE CONCAT('%', #{staffInfo.name}, '%')
+        </if>
+        <if test="staffInfo.status != null">
+            AND si.status = #{staffInfo.status}
+        </if>
+        <if test="staffInfo.phone != null and staffInfo.phone != ''">
+            AND si.phone = #{staffInfo.phone}
+        </if>
+        ORDER BY
+        si.create_date
+    </select>
 </mapper>

@@ -30,7 +30,7 @@ public class WorkAttachmentController {
      */
     @GetMapping("/page")
     public R page(Page<WorkAttachment> page, WorkAttachment workAttachment) {
-        return R.ok();
+        return R.ok(workAttachmentService.queryPage(page, workAttachment));
     }
 
     /**

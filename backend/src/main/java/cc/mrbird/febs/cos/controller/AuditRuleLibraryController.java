@@ -32,7 +32,7 @@ public class AuditRuleLibraryController {
      */
     @GetMapping("/page")
     public R page(Page<AuditRuleLibrary> page, AuditRuleLibrary auditRuleLibrary) {
-        return R.ok();
+        return R.ok(auditRuleLibraryService.queryPage(page, auditRuleLibrary));
     }
 
     /**

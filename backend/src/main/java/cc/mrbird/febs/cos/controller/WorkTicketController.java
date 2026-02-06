@@ -30,7 +30,7 @@ public class WorkTicketController {
      */
     @GetMapping("/page")
     public R page(Page<WorkTicket> page, WorkTicket workTicket) {
-        return R.ok();
+        return R.ok(workTicketService.queryPage(page, workTicket));
     }
 
     /**

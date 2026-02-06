@@ -1,23 +1,23 @@
 package cc.mrbird.febs.cos.entity;
 
-import java.time.LocalDateTime;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 作业票安全措施确认表
+ * 审批流配置
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class WorkMeasure implements Serializable {
+public class WfProcessConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,34 +28,34 @@ public class WorkMeasure implements Serializable {
     private Integer id;
 
     /**
-     * 关联作业票ID
+     * 模板名称
      */
-    private Long ticketId;
+    private String workName;
 
     /**
-     * 安全措施描述
+     * 作业类型
      */
-    private String measureContent;
+    private String workType;
 
     /**
-     * 是否确认(0:未确认, 1:已确认)
+     * 节点顺序
      */
-    private Integer isConfirmed;
+    private Integer nodeOrder;
 
     /**
-     * 确认人ID
+     * 节点名称
      */
-    private Long confirmerId;
+    private String nodeName;
 
     /**
-     * 确认时间
+     * 关联角色: leader/guardian/approver
      */
-    private String confirmTime;
+    private String roleKey;
 
     /**
-     * 现场核实照片地址
+     * 节点处理人
      */
-    private String confirmPhotoUrl;
-
+    @TableField(exist = false)
+    private String nodeAssignees;
 
 }

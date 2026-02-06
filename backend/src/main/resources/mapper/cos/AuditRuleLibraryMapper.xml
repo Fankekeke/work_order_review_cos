@@ -2,4 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.AuditRuleLibraryMapper">
 
+    <!-- 分页获取审核规则信息 -->
+    <select id="queryPage" resultType="java.util.LinkedHashMap">
+        SELECT
+        *
+        FROM
+        audit_rule_library
+        WHERE
+        1 = 1
+        <if test="auditRuleLibrary.ruleName != null and auditRuleLibrary.ruleName != ''">
+            AND rule_name = #{auditRuleLibrary.ruleName}
+        </if>
+        <if test="auditRuleLibrary.isActive != null">
+            AND is_active = #{auditRuleLibrary.isActive}
+        </if>
+        ORDER BY
+        id
+    </select>
 </mapper>

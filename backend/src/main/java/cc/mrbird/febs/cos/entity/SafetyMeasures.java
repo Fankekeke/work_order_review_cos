@@ -10,14 +10,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 作业票附件表
+ * 安全措施落实复核表
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class WorkAttachment implements Serializable {
+public class SafetyMeasures implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,20 +27,35 @@ public class WorkAttachment implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    private Long ticketId;
-
-    private String fileName;
-
-    private String fileUrl;
+    /**
+     * 关联作业单ID
+     */
+    private Long permitId;
 
     /**
-     * 上传节点(1:申请阶段, 2:开工确认, 3:结束报告)
+     * 安全措施内容
      */
-    private Integer uploadNode;
+    private String measureContent;
 
-    private Long uploaderId;
+    /**
+     * 负责人是否落实
+     */
+    private Boolean isConfirmed;
 
-    private String createTime;
+    /**
+     * 监护人是否复核
+     */
+    private Boolean isReviewed;
+
+    /**
+     * 落实时间
+     */
+    private String confirmTime;
+
+    /**
+     * 复核时间
+     */
+    private String reviewTime;
 
 
 }

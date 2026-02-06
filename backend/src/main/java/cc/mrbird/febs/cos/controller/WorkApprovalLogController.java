@@ -30,7 +30,7 @@ public class WorkApprovalLogController {
      */
     @GetMapping("/page")
     public R page(Page<WorkApprovalLog> page, WorkApprovalLog workApprovalLog) {
-        return R.ok();
+        return R.ok(workApprovalLogService.queryPage(page, workApprovalLog));
     }
 
     /**

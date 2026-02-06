@@ -1,6 +1,6 @@
 package cc.mrbird.febs.cos.service;
 
-import cc.mrbird.febs.cos.entity.WorkAttachment;
+import cc.mrbird.febs.cos.entity.SafetyMeasures;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -11,14 +11,14 @@ import java.util.LinkedHashMap;
 /**
  * @author FanK
  */
-public interface IWorkAttachmentService extends IService<WorkAttachment> {
+public interface ISafetyMeasuresService extends IService<SafetyMeasures> {
 
     /**
-     * 分页获取票单附件信息
+     * 分页获取安全措施复核信息
      *
      * @param page           分页对象
-     * @param workAttachment 票单附件信息
+     * @param safetyMeasures 安全措施复核信息
      * @return 结果
      */
-    IPage<LinkedHashMap<String, Object>> queryPage(Page<WorkAttachment> page, WorkAttachment workAttachment);
+    IPage<LinkedHashMap<String, Object>> queryPage(Page<SafetyMeasures> page, SafetyMeasures safetyMeasures);
 }

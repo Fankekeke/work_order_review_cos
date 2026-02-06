@@ -5,57 +5,56 @@ import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 作业票安全措施确认表
+ * 部门管理
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class WorkMeasure implements Serializable {
+public class DeptInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 关联作业票ID
+     * 部门编号
      */
-    private Long ticketId;
+    private String code;
 
     /**
-     * 安全措施描述
+     * 部门名称
      */
-    private String measureContent;
+    private String deptName;
 
     /**
-     * 是否确认(0:未确认, 1:已确认)
+     * 备注
      */
-    private Integer isConfirmed;
+    private String content;
 
     /**
-     * 确认人ID
+     * 创建时间
      */
-    private Long confirmerId;
+    private String createDate;
 
     /**
-     * 确认时间
+     * 创建人
      */
-    private String confirmTime;
+    private String createBy;
 
     /**
-     * 现场核实照片地址
+     * 删除标识
      */
-    private String confirmPhotoUrl;
+    @TableLogic
+    private String delFlag;
 
 
 }

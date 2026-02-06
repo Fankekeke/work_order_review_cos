@@ -30,7 +30,7 @@ public class WorkMeasureController {
      */
     @GetMapping("/page")
     public R page(Page<WorkMeasure> page, WorkMeasure workMeasure) {
-        return R.ok();
+        return R.ok(workMeasureService.queryPage(page, workMeasure));
     }
 
     /**

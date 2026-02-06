@@ -3,6 +3,9 @@ package cc.mrbird.febs.cos.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -18,6 +21,12 @@ import lombok.experimental.Accessors;
 public class WorkTicket implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Integer id;
 
     /**
      * 作业票编号
@@ -52,12 +61,12 @@ public class WorkTicket implements Serializable {
     /**
      * 计划开始时间
      */
-    private LocalDateTime startTime;
+    private String startTime;
 
     /**
      * 计划结束时间
      */
-    private LocalDateTime endTime;
+    private String endTime;
 
     /**
      * 风险等级(低/中等/高)
@@ -74,9 +83,9 @@ public class WorkTicket implements Serializable {
      */
     private String aiAuditSuggestion;
 
-    private LocalDateTime createTime;
+    private String createTime;
 
-    private LocalDateTime updateTime;
+    private String updateTime;
 
 
 }
