@@ -40,12 +40,12 @@ public class SafetyMeasures implements Serializable {
     /**
      * 负责人是否落实
      */
-    private Boolean isConfirmed;
+    private Integer isConfirmed;
 
     /**
      * 监护人是否复核
      */
-    private Boolean isReviewed;
+    private Integer isReviewed;
 
     /**
      * 落实时间
@@ -56,6 +56,4 @@ public class SafetyMeasures implements Serializable {
      * 复核时间
      */
     private String reviewTime;
-
-
 }

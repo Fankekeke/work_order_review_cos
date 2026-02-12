@@ -1,7 +1,9 @@
 package cc.mrbird.febs.cos.controller;
 
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.R;
+import cc.mrbird.febs.cos.entity.WorkApprovalLog;
 import cc.mrbird.febs.cos.entity.WorkTicket;
 import cc.mrbird.febs.cos.service.IWorkTicketService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,7 +26,7 @@ public class WorkTicketController {
     /**
      * 分页获取作业票信息
      *
-     * @param page        分页对象
+     * @param page       分页对象
      * @param workTicket 作业票信息
      * @return 结果
      */
@@ -55,14 +57,45 @@ public class WorkTicketController {
     }
 
     /**
+     * 作业票审核
+     *
+     * @param workApprovalLog 作业票信息
+     * @return 结果
+     */
+    @PostMapping("/audit")
+    public R audit(WorkApprovalLog workApprovalLog) {
+        return R.ok(workTicketService.audit(workApprovalLog));
+    }
+
+    /**
+     * 获取作业票详情
+     *
+     * @param id 作业票ID
+     * @return 结果
+     */
+    @GetMapping("/queryTicketDetail")
+    public R queryTicketDetail(Integer id) {
+        return R.ok(workTicketService.queryTicketDetail(id));
+    }
+
+    /**
+     * 高频风险作业票
+     *
+     * @return 列表
+     */
+    public R queryHighFrequencyRisk() {
+        return R.ok(workTicketService.queryHighFrequencyRisk());
+    }
+
+    /**
      * 新增作业票信息
      *
      * @param workTicket 作业票信息
      * @return 结果
      */
     @PostMapping
-    public R save(WorkTicket workTicket) {
-        return R.ok(workTicketService.save(workTicket));
+    public R save(WorkTicket workTicket) throws FebsException {
+        return R.ok(workTicketService.addWorkTicket(workTicket));
     }
 
     /**

@@ -41,5 +41,9 @@ public class WfNodeAssignees implements Serializable {
      */
     private Long userId;
 
+    /**
+     * 节点顺序
+     */
+    private Integer nodeOrder;
 
 }

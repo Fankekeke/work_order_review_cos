@@ -73,6 +73,11 @@ public class WfProcessConfigController {
         if (StrUtil.isEmpty(wfProcessConfig.getNodeAssignees())) {
             throw new FebsException("请选择审批人");
         }
+        // 判断是否已经存在此作业类型
+        long count = wfProcessConfigService.count(Wrappers.<WfProcessConfig>lambdaQuery().eq(WfProcessConfig::getWorkType, wfProcessConfig.getWorkType()));
+        if (count > 0) {
+            throw new FebsException("此作业类型已存在");
+        }
         List<WfNodeAssignees> nodeAssignees = JSONUtil.toList(wfProcessConfig.getNodeAssignees(), WfNodeAssignees.class);
         wfProcessConfigService.save(wfProcessConfig);
         for (WfNodeAssignees nodeAssignee : nodeAssignees) {
@@ -91,6 +96,11 @@ public class WfProcessConfigController {
     public R edit(WfProcessConfig wfProcessConfig) throws FebsException {
         if (StrUtil.isEmpty(wfProcessConfig.getNodeAssignees())) {
             throw new FebsException("请选择审批人");
+        }
+        // 判断是否已经存在此作业类型
+        long count = wfProcessConfigService.count(Wrappers.<WfProcessConfig>lambdaQuery().eq(WfProcessConfig::getWorkType, wfProcessConfig.getWorkType()).ne(WfProcessConfig::getId, wfProcessConfig.getId()));
+        if (count > 0) {
+            throw new FebsException("此作业类型已存在");
         }
         wfNodeAssigneesService.remove(Wrappers.<WfNodeAssignees>lambdaQuery().eq(WfNodeAssignees::getProcessId, wfProcessConfig.getId()));
         List<WfNodeAssignees> nodeAssignees = JSONUtil.toList(wfProcessConfig.getNodeAssignees(), WfNodeAssignees.class);

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,7 +39,7 @@ public class WorkApprovalLog implements Serializable {
     private Long approverId;
 
     /**
-     * 操作(1:通过, 2:驳回)
+     * 操作(-1：未审核 1:通过, 2:驳回, 3:中止)
      */
     private Integer action;
 
@@ -58,6 +59,5 @@ public class WorkApprovalLog implements Serializable {
      * 电子签名
      */
     private String electronicSign;
-
 
 }

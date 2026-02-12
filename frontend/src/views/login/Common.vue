@@ -3,7 +3,7 @@
     <div class="content" style="margin: 0 auto">
       <div class="top">
         <div class="header">
-          <span class="title" style="color: #4a4a48">星速校园快递配送系统</span>
+          <span class="title" style="color: #4a4a48">作业单智能审批系统</span>
         </div>
         <div class="desc"></div>
       </div>

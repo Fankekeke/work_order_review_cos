@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -26,5 +27,25 @@ public class StaffInfoServiceImpl extends ServiceImpl<StaffInfoMapper, StaffInfo
     @Override
     public IPage<LinkedHashMap<String, Object>> queryPage(Page<StaffInfo> page, StaffInfo staffInfo) {
         return baseMapper.queryPage(page, staffInfo);
+    }
+
+    /**
+     * 获取员工信息列表
+     *
+     * @return 结果
+     */
+    @Override
+    public List<LinkedHashMap<String, Object>> queryList() {
+        return baseMapper.queryList();
+    }
+
+    /**
+     * 获取员工信息列表
+     *
+     * @return 结果
+     */
+    @Override
+    public List<StaffInfo> getStaffInfoList() {
+        return baseMapper.getStaffInfoList();
     }
 }

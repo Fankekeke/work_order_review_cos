@@ -34,6 +34,16 @@ public class StaffInfoController {
     }
 
     /**
+     * 获取员工信息列表
+     *
+     * @return 列表
+     */
+    @GetMapping("/queryList")
+    private R queryList() {
+        return R.ok(staffInfoService.queryList());
+    }
+
+    /**
      * 获取ID获取员工详情
      *
      * @param id 主键

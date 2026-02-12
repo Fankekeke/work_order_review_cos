@@ -34,12 +34,12 @@ public class WorkTicket implements Serializable {
     private String ticketCode;
 
     /**
-     * 作业类型(1:动火, 2:高处, 3:受限空间)
+     * 作业类型
      */
-    private Integer type;
+    private String type;
 
     /**
-     * 状态(0:草稿, 1:待审批, 2:作业中, 3:已完工, 4:已驳回)
+     * 状态(1:正在初审, 2:正在复审, 3:正在终审, 4:已驳回 5:安全措施 6:措施落实)
      */
     private Integer status;
 
