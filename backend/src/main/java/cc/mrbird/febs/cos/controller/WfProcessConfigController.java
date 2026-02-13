@@ -7,6 +7,7 @@ import cc.mrbird.febs.cos.entity.WfNodeAssignees;
 import cc.mrbird.febs.cos.entity.WfProcessConfig;
 import cc.mrbird.febs.cos.service.IWfNodeAssigneesService;
 import cc.mrbird.febs.cos.service.IWfProcessConfigService;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -79,6 +81,7 @@ public class WfProcessConfigController {
             throw new FebsException("此作业类型已存在");
         }
         List<WfNodeAssignees> nodeAssignees = JSONUtil.toList(wfProcessConfig.getNodeAssignees(), WfNodeAssignees.class);
+        wfProcessConfig.setCreateDate(DateUtil.formatDateTime(new Date()));
         wfProcessConfigService.save(wfProcessConfig);
         for (WfNodeAssignees nodeAssignee : nodeAssignees) {
             nodeAssignee.setProcessId(Long.valueOf(wfProcessConfig.getId()));

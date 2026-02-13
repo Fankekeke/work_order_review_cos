@@ -2,4 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.WorkMeasureMapper">
 
+    <!-- 分页获取安全措施确认信息 -->
+    <select id="queryPage" resultType="java.util.LinkedHashMap">
+        SELECT wm.*,
+        wt.ticket_code,
+        wt.type,
+
+        si.name as staffName,
+        si.images as staffImages,
+        di.dept_name,
+        poi.name as positionName,
+
+        wt.wtwork_content,
+        wt.wtlocation,
+        wt.wtstart_time,
+        wt.wtend_time,
+        wt.wtrisk_level,
+        wt.wtai_audit_score,
+        wt.wtai_audit_suggestion
+        FROM work_measure wm
+        left join work_ticket wt on (wt.id = wm.ticket_id)
+        LEFT JOIN staff_info si ON (si.id = wm.confirmer_id)
+        left join dept_info di on
+        (di.id = si.dept_id)
+        left join position_info poi on
+        (poi.id = si.position_id)
+        WHERE 1 = 1
+        <if test="workMeasure.staffName != null and workMeasure.staffName != ''">
+            AND si.name LIKE CONCAT('%', #{workMeasure.staffName}, '%')
+        </if>
+        <if test="workMeasure.type != null and workMeasure.type != ''">
+            AND wt.type LIKE CONCAT('%', #{workMeasure.type}, '%')
+        </if>
+        <if test="workMeasure.isConfirmed != null and workMeasure.isConfirmed != ''">
+            AND wt.is_confirmed = #{workMeasure.isConfirmed}
+        </if>
+        <if test="workMeasure.riskLevel != null and workMeasure.riskLevel != ''">
+            AND wt.risk_level = #{workMeasure.riskLevel}
+        </if>
+        ORDER BY wm.confirm_time
+    </select>
 </mapper>

@@ -53,6 +53,11 @@ public class WfProcessConfig implements Serializable {
     private String roleKey;
 
     /**
+     * 创建时间
+     */
+    private String createDate;
+
+    /**
      * 节点处理人
      */
     @TableField(exist = false)

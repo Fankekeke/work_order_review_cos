@@ -7,6 +7,7 @@ import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -35,39 +36,54 @@ public class StaffInfo implements Serializable {
     private String code;
 
     /**
-     * 员工姓名
+     * 姓名
      */
     private String name;
 
     /**
-     * 性别（1.男 2.女）
+     * 性别
      */
-    private Integer sex;
+    private String sex;
 
     /**
-     * 状态（1.接单中 2.离开）
+     * 出生日期
      */
-    private Integer status;
+    private String birthday;
 
     /**
-     * 照片
+     * 籍贯
+     */
+    private String nativeAddress;
+
+    /**
+     * 身份证号码
+     */
+    private String idCard;
+
+    /**
+     * 头像
      */
     private String images;
 
     /**
-     * 创建时间
+     * 学历
      */
-    private String createDate;
+    private String diploma;
 
     /**
-     * 所属账户
+     * 学校名称
      */
-    private Long userId;
+    private String schoolName;
+
+    /**
+     * 家庭住址
+     */
+    private String address;
 
     /**
      * 邮箱地址
      */
-    private String email;
+    private String mail;
 
     /**
      * 联系方式
@@ -75,49 +91,25 @@ public class StaffInfo implements Serializable {
     private String phone;
 
     /**
-     * 身份证地址
+     * 创建时间
      */
-    private String address;
+    private String createDate;
 
     /**
-     * 民族
+     * 删除标识
      */
-    private String ethnicity;
+    @TableLogic
+    private String delFlag;
 
     /**
-     * 真实姓名
+     * 所属部门
      */
-    private String realName;
+    private Integer deptId;
 
     /**
-     * 身份证号码
+     * 岗位管理
      */
-    private String idNumber;
-
-    /**
-     * 出生日期
-     */
-    private String birthDate;
-
-    /**
-     * 身份证正面
-     */
-    private String idCardFrontImages;
-
-    /**
-     * 身份证反面
-     */
-    private String idCardReverseImages;
-
-    /**
-     * 职位ID
-     */
-    private String positionId;
-
-    /**
-     * 部门ID
-     */
-    private String deptId;
+    private Integer positionId;
 
     @TableField(exist = false)
     private String positionName;

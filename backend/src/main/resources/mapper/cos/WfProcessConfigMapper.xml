@@ -2,4 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.WfProcessConfigMapper">
 
+    <!-- 分页获取审批流配置信息 -->
+    <select id="queryPage" resultType="java.util.LinkedHashMap">
+        SELECT id,
+        work_name,
+        node_order,
+        node_name,
+        role_key,
+        work_type,
+        create_date
+        FROM wf_process_config
+        WHERE 1 = 1
+        <if test="wfProcessConfig.workName != null and wfProcessConfig.workName != ''">
+            AND work_name LIKE CONCAT('%',#{wfProcessConfig.workName},'%')
+        </if>
+        <if test="wfProcessConfig.workType != null and wfProcessConfig.workType != ''">
+            AND work_type LIKE CONCAT('%',#{wfProcessConfig.workType},'%')
+        </if>
+        ORDER BY create_date DESC
+    </select>
 </mapper>

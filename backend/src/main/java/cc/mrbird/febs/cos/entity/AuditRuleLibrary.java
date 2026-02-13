@@ -51,5 +51,4 @@ public class AuditRuleLibrary implements Serializable {
      */
     private Integer isActive;
 
-
 }

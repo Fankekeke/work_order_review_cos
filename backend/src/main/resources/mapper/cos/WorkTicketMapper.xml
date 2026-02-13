@@ -2,4 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.WorkTicketMapper">
 
+    <!-- 分页获取作业票信息 -->
+    <select id="queryPage" resultType="java.util.LinkedHashMap">
+        SELECT
+        wt.*,
+        si.name as staffName,
+        si.images as staffImages,
+        di.dept_name,
+        poi.name as positionName
+        FROM
+        work_ticket wt
+        LEFT JOIN staff_info si ON (si.id = wt.applicant_id)
+        left join dept_info di on
+        (di.id = si.dept_id)
+        left join position_info poi on
+        (poi.id = si.position_id)
+        WHERE
+        1 = 1
+        <if test="workTicket.staffName != null and workTicket.staffName != ''">
+            AND si.name LIKE CONCAT('%', #{workTicket.staffName}, '%')
+        </if>
+        <if test="workTicket.type != null and workTicket.type != ''">
+            AND wt.type LIKE CONCAT('%', #{workTicket.type}, '%')
+        </if>
+        <if test="workTicket.status != null and workTicket.status != ''">
+            AND wt.status = #{workTicket.status}
+        </if>
+        <if test="workTicket.riskLevel != null and workTicket.riskLevel != ''">
+            AND wt.risk_level = #{workTicket.riskLevel}
+        </if>
+        ORDER BY
+        wt.create_time DESC
+    </select>
 </mapper>
