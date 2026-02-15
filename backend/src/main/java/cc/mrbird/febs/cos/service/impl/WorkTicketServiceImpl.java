@@ -212,7 +212,6 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
         LinkedHashMap<String, Object> result = new LinkedHashMap<>();
         result.put("totalHighRiskTickets", highRiskTickets.size()); // 总高风险作业票数
         result.put("highFrequencyRiskTypes", sortedRiskTypes); // 高频风险作业类型及预警次数
-
         return result;
     }
 

@@ -63,4 +63,12 @@ public class WfProcessConfig implements Serializable {
     @TableField(exist = false)
     private String nodeAssignees;
 
+    @TableField(exist = false)
+    private Integer reviewer1;
+
+    @TableField(exist = false)
+    private Integer reviewer2;
+
+    @TableField(exist = false)
+    private Integer reviewer3;
 }

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -72,20 +73,36 @@ public class WfProcessConfigController {
      */
     @PostMapping
     public R save(WfProcessConfig wfProcessConfig) throws FebsException {
-        if (StrUtil.isEmpty(wfProcessConfig.getNodeAssignees())) {
-            throw new FebsException("请选择审批人");
-        }
         // 判断是否已经存在此作业类型
         long count = wfProcessConfigService.count(Wrappers.<WfProcessConfig>lambdaQuery().eq(WfProcessConfig::getWorkType, wfProcessConfig.getWorkType()));
         if (count > 0) {
             throw new FebsException("此作业类型已存在");
         }
-        List<WfNodeAssignees> nodeAssignees = JSONUtil.toList(wfProcessConfig.getNodeAssignees(), WfNodeAssignees.class);
+        List<WfNodeAssignees> nodeAssignees = new ArrayList<>();
         wfProcessConfig.setCreateDate(DateUtil.formatDateTime(new Date()));
         wfProcessConfigService.save(wfProcessConfig);
-        for (WfNodeAssignees nodeAssignee : nodeAssignees) {
-            nodeAssignee.setProcessId(Long.valueOf(wfProcessConfig.getId()));
-        }
+
+        WfNodeAssignees nodeAssignees1 = new WfNodeAssignees();
+        nodeAssignees1.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees1.setRoleKey("初审");
+        nodeAssignees1.setNodeOrder(1);
+        nodeAssignees1.setUserId(Long.valueOf(wfProcessConfig.getReviewer1()));
+
+        WfNodeAssignees nodeAssignees2 = new WfNodeAssignees();
+        nodeAssignees2.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees2.setRoleKey("复审");
+        nodeAssignees2.setNodeOrder(2);
+        nodeAssignees2.setUserId(Long.valueOf(wfProcessConfig.getReviewer2()));
+
+        WfNodeAssignees nodeAssignees3 = new WfNodeAssignees();
+        nodeAssignees3.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees3.setRoleKey("终审");
+        nodeAssignees3.setNodeOrder(3);
+        nodeAssignees3.setUserId(Long.valueOf(wfProcessConfig.getReviewer3()));
+
+        nodeAssignees.add(nodeAssignees1);
+        nodeAssignees.add(nodeAssignees2);
+        nodeAssignees.add(nodeAssignees3);
         return R.ok(wfNodeAssigneesService.saveBatch(nodeAssignees));
     }
 
@@ -97,20 +114,36 @@ public class WfProcessConfigController {
      */
     @PutMapping
     public R edit(WfProcessConfig wfProcessConfig) throws FebsException {
-        if (StrUtil.isEmpty(wfProcessConfig.getNodeAssignees())) {
-            throw new FebsException("请选择审批人");
-        }
         // 判断是否已经存在此作业类型
         long count = wfProcessConfigService.count(Wrappers.<WfProcessConfig>lambdaQuery().eq(WfProcessConfig::getWorkType, wfProcessConfig.getWorkType()).ne(WfProcessConfig::getId, wfProcessConfig.getId()));
         if (count > 0) {
             throw new FebsException("此作业类型已存在");
         }
         wfNodeAssigneesService.remove(Wrappers.<WfNodeAssignees>lambdaQuery().eq(WfNodeAssignees::getProcessId, wfProcessConfig.getId()));
-        List<WfNodeAssignees> nodeAssignees = JSONUtil.toList(wfProcessConfig.getNodeAssignees(), WfNodeAssignees.class);
+        List<WfNodeAssignees> nodeAssignees = new ArrayList<>();
+
+        WfNodeAssignees nodeAssignees1 = new WfNodeAssignees();
+        nodeAssignees1.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees1.setRoleKey("初审");
+        nodeAssignees1.setNodeOrder(1);
+        nodeAssignees1.setUserId(Long.valueOf(wfProcessConfig.getReviewer1()));
+
+        WfNodeAssignees nodeAssignees2 = new WfNodeAssignees();
+        nodeAssignees2.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees2.setRoleKey("复审");
+        nodeAssignees2.setNodeOrder(2);
+        nodeAssignees2.setUserId(Long.valueOf(wfProcessConfig.getReviewer2()));
+
+        WfNodeAssignees nodeAssignees3 = new WfNodeAssignees();
+        nodeAssignees3.setProcessId(Long.valueOf(wfProcessConfig.getId()));
+        nodeAssignees3.setRoleKey("终审");
+        nodeAssignees3.setNodeOrder(3);
+        nodeAssignees3.setUserId(Long.valueOf(wfProcessConfig.getReviewer3()));
+
+        nodeAssignees.add(nodeAssignees1);
+        nodeAssignees.add(nodeAssignees2);
+        nodeAssignees.add(nodeAssignees3);
         wfProcessConfigService.updateById(wfProcessConfig);
-        for (WfNodeAssignees nodeAssignee : nodeAssignees) {
-            nodeAssignee.setProcessId(Long.valueOf(wfProcessConfig.getId()));
-        }
         return R.ok(wfNodeAssigneesService.saveBatch(nodeAssignees));
     }
 

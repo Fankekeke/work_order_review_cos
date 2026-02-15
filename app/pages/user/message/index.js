@@ -24,7 +24,7 @@ Page({
       key: 'userInfo',
       success: (res) => {
         this.setData({ userInfo: res.data })
-        this.messageList()
+        this.getBulletinList()
       },
       fail: res => {
         wx.showToast({
@@ -40,20 +40,28 @@ Page({
       }
     })
   },
+  getBulletinList() {
+    http.get('getBulletinList').then((r) => {
+      r.data.forEach(item => {
+        item.days = this.timeFormat(item.date)
+        if (item.images) {
+          item.images = 'http://127.0.0.1:9527/imagesWeb/' + item.images
+        }
+      });
+      console.log(JSON.stringify(r.data))
+      this.setData({ messageList: r.data })
+    })
+  },
   messageDetail(event) {
-    let takeUser = event.currentTarget.dataset.take
-    let sendUser = event.currentTarget.dataset.send
-    let takeUserName = event.currentTarget.dataset.takename
-    let sendUserName = event.currentTarget.dataset.sendname
-    let otherName = sendUser == this.data.userInfo.id ? takeUserName : sendUserName
+    let bulletinId = event.currentTarget.dataset.id
     wx.navigateTo({
-			url: '/pages/user/detail/index?takeUser='+takeUser+'&sendUser='+sendUser+'&otherName='+otherName+''
+			url: '/pages/user/messageDetail/index?bulletinId='+ bulletinId
 		});
   },
   messageList() {
     http.get('messageListById', { userId: this.data.userInfo.id }).then((r) => {
       r.data.forEach(item => {
-        item.days = this.timeFormat(item.createDate)
+        item.days = this.timeFormat(item.date)
         if (item.sendUserAvatar && !item.sendUserAvatar.includes('http')) {
           item.sendUserAvatar = 'http://127.0.0.1:9527/imagesWeb/' + item.sendUserAvatar
         }

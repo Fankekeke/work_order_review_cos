@@ -50,7 +50,7 @@
               <a-form-item label='初审人员' v-bind="formItemLayout">
                 <a-select
                   v-decorator="[
-        'reviewer1.userId',
+        'reviewer1',
         { rules: [{ required: true, message: '请选择初审人员!' }] }
       ]"
                   placeholder="请选择初审人员"
@@ -79,7 +79,7 @@
               <a-form-item label='复审人员' v-bind="formItemLayout">
                 <a-select
                   v-decorator="[
-        'reviewer2.userId',
+        'reviewer2',
         { rules: [{ required: true, message: '请选择复审人员!' }] }
       ]"
                   placeholder="请选择复审人员"
@@ -108,7 +108,7 @@
               <a-form-item label='终审人员' v-bind="formItemLayout">
                 <a-select
                   v-decorator="[
-        'reviewer3.userId',
+        'reviewer3',
         { rules: [{ required: true, message: '请选择终审人员!' }] }
       ]"
                   placeholder="请选择终审人员"
@@ -233,7 +233,7 @@ export default {
         images.push(image.response)
       })
       this.form.validateFields((err, values) => {
-        values.images = images.length > 0 ? images.join(',') : null
+        console.log(JSON.stringify(values))
         if (!err) {
           this.loading = true
           this.$post('/cos/wf-process-config', {

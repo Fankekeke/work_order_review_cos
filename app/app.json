@@ -24,7 +24,8 @@
     "pages/user/address/index",
     "pages/user/audit/index",
     "pages/user/goods/index",
-    "pages/check/index/index"
+    "pages/check/index/index",
+    "pages/user/messageDetail/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#39b54a",
@@ -48,13 +49,13 @@
         "pagePath": "pages/check/index/index",
         "iconPath": "img/goodscar.png",
         "selectedIconPath": "img/goodscar1.png",
-        "text": "接单"
+        "text": "作业"
       },
       {
         "pagePath": "pages/user/message/index",
         "iconPath": "img/message.png",
         "selectedIconPath": "img/message1.png",
-        "text": "消息"
+        "text": "公告"
       },
       {
         "pagePath": "pages/user/index/index",

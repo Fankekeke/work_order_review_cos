@@ -4,21 +4,43 @@
 
     <!-- 分页获取审批流配置信息 -->
     <select id="queryPage" resultType="java.util.LinkedHashMap">
-        SELECT id,
-        work_name,
-        node_order,
-        node_name,
-        role_key,
-        work_type,
-        create_date
-        FROM wf_process_config
+        SELECT wfpc.id,
+        wfpc.work_name,
+        wfpc.node_order,
+        wfpc.node_name,
+        wfpc.role_key,
+        wfpc.work_type,
+        wfpc.create_date
+        FROM wf_process_config wfpc
         WHERE 1 = 1
         <if test="wfProcessConfig.workName != null and wfProcessConfig.workName != ''">
-            AND work_name LIKE CONCAT('%',#{wfProcessConfig.workName},'%')
+            AND wfpc.work_name LIKE CONCAT('%',#{wfProcessConfig.workName},'%')
         </if>
         <if test="wfProcessConfig.workType != null and wfProcessConfig.workType != ''">
-            AND work_type LIKE CONCAT('%',#{wfProcessConfig.workType},'%')
+            AND wfpc.work_type LIKE CONCAT('%',#{wfProcessConfig.workType},'%')
         </if>
-        ORDER BY create_date DESC
+        ORDER BY wfpc.create_date DESC
+    </select>
+
+    <!-- 获取审批流详情 -->
+    <select id="queryProcessDetail" resultType="cc.mrbird.febs.cos.entity.AuditUser">
+        SELECT wfns.*,
+        si.name as staffName,
+        si.images as staffImages,
+        di.dept_name,
+        poi.name as positionName
+        FROM wf_node_assignees wfns
+        LEFT JOIN staff_info si ON (si.id = wfns.user_id)
+        left join dept_info di on
+        (di.id = si.dept_id)
+        left join position_info poi on
+        (poi.id = si.position_id)
+        WHERE 1 = 1
+        <if test="processIds != null and processIds.size() > 0">
+            AND wfns.process_id IN
+            <foreach item="item" collection="processIds" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
     </select>
 </mapper>

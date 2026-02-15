@@ -38,6 +38,7 @@ public class WebController {
 
     private final IBulletinInfoService bulletinInfoService;
 
+    private final IStaffInfoService staffInfoService;
 
     /**
      * File 转MultipartFile
@@ -58,74 +59,72 @@ public class WebController {
         return multipartFile;
     }
 
-//    @PostMapping("/userAdd")
-//    public R userAdd(@RequestBody UserInfo user) throws Exception {
-//        String url = "https://api.weixin.qq.com/sns/jscode2session";
-//        url += "?appid=wx76a6577665633a86";//自己的appid
-//        url += "&secret=78070ccedf3f17b272b84bdeeca28a2e";//自己的appSecret
-//        url += "&js_code=" + user.getOpenId();
-//        url += "&grant_type=authorization_code";
-//        url += "&connect_redirect=1";
-//        String res = null;
-//        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-//        // DefaultHttpClient();
-//        HttpGet httpget = new HttpGet(url);
-//        CloseableHttpResponse response = null;
-//        // 配置信息
-//        RequestConfig requestConfig = RequestConfig.custom()
-//                .setConnectTimeout(5000)
-//                .setConnectionRequestTimeout(5000)
-//                .setSocketTimeout(5000)
-//                .setRedirectsEnabled(false).build();
-//        httpget.setConfig(requestConfig);
-//        response = httpClient.execute(httpget);
-//        HttpEntity responseEntity = response.getEntity();
-//        System.out.println("响应状态为:" + response.getStatusLine());
-//        if (responseEntity != null) {
-//            res = EntityUtils.toString(responseEntity);
-//            System.out.println("响应内容长度为:" + responseEntity.getContentLength());
-//            System.out.println("响应内容为:" + res);
-//        }
-//        // 释放资源
-//        httpClient.close();
-//        response.close();
-//        String openid = JSON.parseObject(res).get("openid").toString();
+    @PostMapping("/userAdd")
+    public R userAdd(@RequestBody StaffInfo user) throws Exception {
+        String url = "https://api.weixin.qq.com/sns/jscode2session";
+        url += "?appid=wx76a6577665633a86";//自己的appid
+        url += "&secret=78070ccedf3f17b272b84bdeeca28a2e";//自己的appSecret
+        url += "&js_code=" + user.getOpenId();
+        url += "&grant_type=authorization_code";
+        url += "&connect_redirect=1";
+        String res = null;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        // DefaultHttpClient();
+        HttpGet httpget = new HttpGet(url);
+        CloseableHttpResponse response = null;
+        // 配置信息
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(5000)
+                .setConnectionRequestTimeout(5000)
+                .setSocketTimeout(5000)
+                .setRedirectsEnabled(false).build();
+        httpget.setConfig(requestConfig);
+        response = httpClient.execute(httpget);
+        HttpEntity responseEntity = response.getEntity();
+        System.out.println("响应状态为:" + response.getStatusLine());
+        if (responseEntity != null) {
+            res = EntityUtils.toString(responseEntity);
+            System.out.println("响应内容长度为:" + responseEntity.getContentLength());
+            System.out.println("响应内容为:" + res);
+        }
+        // 释放资源
+        httpClient.close();
+        response.close();
+        String openid = JSON.parseObject(res).get("openid").toString();
+
+        System.out.println("openid" + openid);
+        int count = staffInfoService.count(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getOpenId, openid));
+        if (count > 0) {
+            return R.ok(staffInfoService.getOne(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getOpenId, openid)));
+        } else {
+            user.setOpenId(openid);
+            user.setCreateDate(DateUtil.formatDateTime(new Date()));
+            user.setName(user.getUserName());
+            user.setCode("UR-" + System.currentTimeMillis());
+            // 图片上传
+            byte[] bytes = HttpUtil.downloadBytes(user.getAvatar());
+            MultipartFile multipartFile = new MockMultipartFile("xxx.jpg", "xxx.jpg", ".jpg", bytes);
+//            MultipartFile cMultiFile = new MockMultipartFile("file", file.getName(), null, new FileInputStream(file));
 //
-////        String openid = "oeDfR58jT62s8t7l5nQbPYdss5-I";
-//        System.out.println("openid" + openid);
-//        int count = userInfoService.count(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getOpenId, openid));
-//        if (count > 0) {
-//            return R.ok(userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getOpenId, openid)));
-//        } else {
-//            user.setOpenId(openid);
-//            user.setCreateDate(DateUtil.formatDateTime(new Date()));
-//            user.setName(user.getUserName());
-//            user.setCode("UR-" + System.currentTimeMillis());
-//            // 图片上传
-//            byte[] bytes = HttpUtil.downloadBytes(user.getAvatar());
-//            MultipartFile multipartFile = new MockMultipartFile("xxx.jpg", "xxx.jpg", ".jpg", bytes);
-////            MultipartFile cMultiFile = new MockMultipartFile("file", file.getName(), null, new FileInputStream(file));
-////
-//            // 1定义要上传文件 的存放路径
-//            String localPath = "G:/Project/20250227校园快递配送系统/db";
-//            // 2获得文件名字
-//            String fileName = multipartFile.getName();
-//            // 2上传失败提示
-//            String warning = "";
-//            String newFileName = cc.mrbird.febs.common.utils.FileUtil.upload(multipartFile, localPath, fileName);
-//            if (newFileName != null) {
-//                //上传成功
-//                warning = newFileName;
-//            } else {
-//                warning = "上传失败";
-//            }
-//            System.out.println(warning);
-//            user.setImages(warning);
-//            user.setType("1");
-//            userInfoService.save(user);
-//            return R.ok(user);
-//        }
-//    }
+            // 1定义要上传文件 的存放路径
+            String localPath = "G:/Project/20250227校园快递配送系统/db";
+            // 2获得文件名字
+            String fileName = multipartFile.getName();
+            // 2上传失败提示
+            String warning = "";
+            String newFileName = cc.mrbird.febs.common.utils.FileUtil.upload(multipartFile, localPath, fileName);
+            if (newFileName != null) {
+                //上传成功
+                warning = newFileName;
+            } else {
+                warning = "上传失败";
+            }
+            System.out.println(warning);
+            user.setImages(warning);
+            staffInfoService.save(user);
+            return R.ok(user);
+        }
+    }
 
     @RequestMapping("/openid")
     public R getUserInfo(@RequestParam(name = "code") String code) throws Exception {
@@ -209,6 +208,22 @@ public class WebController {
         };
         String result = HttpUtil.post(url, JSONUtil.toJsonStr(subscription));
         return R.ok(result);
+    }
+
+    /**
+     * 公告列表
+     */
+    @GetMapping("/getBulletinList")
+    public R getBulletinList() {
+        return R.ok(bulletinInfoService.list(Wrappers.<BulletinInfo>lambdaQuery().eq(BulletinInfo::getType, 1).orderByDesc(BulletinInfo::getDate)));
+    }
+
+    /**
+     * 公告详情
+     */
+    @GetMapping("/queryBulletinDetail")
+    public R queryBulletinDetail(Integer id) {
+        return R.ok(bulletinInfoService.getById(id));
     }
 
 }

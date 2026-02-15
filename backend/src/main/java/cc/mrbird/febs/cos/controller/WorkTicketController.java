@@ -83,6 +83,7 @@ public class WorkTicketController {
      *
      * @return 列表
      */
+    @GetMapping("/queryHighFrequencyRisk")
     public R queryHighFrequencyRisk() {
         return R.ok(workTicketService.queryHighFrequencyRisk());
     }

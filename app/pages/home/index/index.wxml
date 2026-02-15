@@ -47,10 +47,57 @@
 <view class="bg-white solid-bottom">
     <view style="padding: 15px 10px 20px 10px">
         <van-cell-group inset border="{{false}}">
-            <van-cell clickable arrow-direction="left" border="{{false}}" center title="物品地址"
-                label="{{ startPoint.address }}" is-link data-type="1" bindtap="openPopup" />
-            <van-cell clickable arrow-direction="left" border="{{false}}" center title="收货地址"
-                label="{{ endPoint.address }}" is-link data-type="2" bindtap="openPopup" />
+            <!-- 作业类型 -->
+            <van-cell
+                    clickable
+                    arrow-direction="right"
+                    border="{{false}}"
+                    center
+                    title="作业类型"
+                    label="{{ workType }}"
+                    is-link
+                    bindtap="selectWorkType"
+            />
+
+            <!-- 作业内容描述 -->
+            <van-field
+                    value="{{ workContent }}"
+                    placeholder="请输入作业内容描述"
+                    border="{{false}}"
+                    bind:change="onWorkContentChange"
+            />
+
+            <!-- 作业地点 -->
+            <van-field
+                    value="{{ location }}"
+                    placeholder="请输入作业地点"
+                    border="{{false}}"
+                    bind:change="onLocationChange"
+            />
+
+            <!-- 计划开始时间 -->
+            <van-cell
+                    clickable
+                    arrow-direction="right"
+                    border="{{false}}"
+                    center
+                    title="计划开始时间"
+                    label="{{ startTime }}"
+                    is-link
+                    bindtap="selectStartTime"
+            />
+
+            <!-- 计划结束时间 -->
+            <van-cell
+                    clickable
+                    arrow-direction="right"
+                    border="{{false}}"
+                    center
+                    title="计划结束时间"
+                    label="{{ endTime }}"
+                    is-link
+                    bindtap="selectEndTime"
+            />
         </van-cell-group>
         <view style="padding: 10px 12px 0 12px">
             <van-button type="info" size="normal" style="width: 100%" block bind:click="submit" color="#6d07a8">提交预约
@@ -58,6 +105,54 @@
         </view>
     </view>
 </view>
+
+        <!-- 作业类型弹窗 -->
+<van-popup
+        close-on-click-overlay
+        round
+        show="{{ showWorkTypePicker }}"
+        bind:close="onCloseWorkTypePicker"
+        position="bottom"
+>
+    <van-picker
+            columns="{{ workTypeList }}"
+            bind:cancel="onCloseWorkTypePicker"
+            bind:confirm="onConfirmWorkType"
+            show-toolbar
+    />
+</van-popup>
+
+        <!-- 开始时间弹窗 -->
+<van-popup
+        close-on-click-overlay
+        round
+        show="{{ showStartTimePicker }}"
+        bind:close="onCloseStartTimePicker"
+        position="bottom"
+>
+    <van-datetime-picker
+            type="datetime"
+            bind:cancel="onCloseStartTimePicker"
+            bind:confirm="onConfirmStartTime"
+            show-toolbar
+    />
+</van-popup>
+
+        <!-- 结束时间弹窗 -->
+<van-popup
+        close-on-click-overlay
+        round
+        show="{{ showEndTimePicker }}"
+        bind:close="onCloseEndTimePicker"
+        position="bottom"
+>
+    <van-datetime-picker
+            type="datetime"
+            bind:cancel="onCloseEndTimePicker"
+            bind:confirm="onConfirmEndTime"
+            show-toolbar
+    />
+</van-popup>
 
 <van-popup close-on-click-overlay round show="{{ startPoint.show }}" data-type="1" bind:close="onClose" position="bottom">
     <van-picker columns="{{ addressList }}" data-type="1" bind:cancel="onClose" bind:confirm="onChange"
@@ -70,14 +165,14 @@
 </van-popup>
 
 <!--宫格功能区域-->
-<view class="cu-list margin-top grid col-4 no-border">
-    <block wx:for="{{iconList}}" wx:key="item.id">
-        <view class="cu-item" bindtap="itemckcred" data-index="{{item.id}}" data-itemtype="{{item.type}}">
-            <view class='icon-{{item.icon}} text-{{item.color}}'> </view>
-            <text>{{item.name}}</text>
-        </view>
-    </block>
-</view>
+<!--<view class="cu-list margin-top grid col-4 no-border">-->
+<!--    <block wx:for="{{iconList}}" wx:key="item.id">-->
+<!--        <view class="cu-item" bindtap="itemckcred" data-index="{{item.id}}" data-itemtype="{{item.type}}">-->
+<!--            <view class='icon-{{item.icon}} text-{{item.color}}'> </view>-->
+<!--            <text>{{item.name}}</text>-->
+<!--        </view>-->
+<!--    </block>-->
+<!--</view>-->
 
 <!--视频区域-->
 <!-- <video class="canui-video shadow-warp bg-white" src="{{videosrc}}"></video> -->
@@ -110,28 +205,28 @@
 </view> -->
 
 <!--论坛-->
-<view class="cu-bar bg-white solid-bottom margin-top">
-    <view class='action'>
-        <text class='icon-title text-orange'></text> 社区交流
-    </view>
-    <navigator hover-class='none' url="/pages/coupon/index/index">
-        <view class='action' style="font-size: 27rpx;"> 更多 <view class='icon-right'></view>
-        </view>
-    </navigator>
-</view>
-<view class="cu-list menu menu-avatar">
-    <view class="cu-item " wx:for="{{postInfo}}" bindtap='postDetail' data-postId='{{ item.id }}'>
-        <view class="cu-avatar radius lg"
-            style="background-image:url(http://127.0.0.1:9527/imagesWeb/{{ item.image }});"></view>
-        <view class='content'>
-            <view class="text-titile">{{ item.title }}</view>
-            <view class='text-gray text-sm'>{{ item.content }}</view>
-        </view>
-        <view class='action'>
-            <view class='text-grey text-xs'>{{ item.days }}</view>
-        </view>
-    </view>
-</view>
+<!--<view class="cu-bar bg-white solid-bottom margin-top">-->
+<!--    <view class='action'>-->
+<!--        <text class='icon-title text-orange'></text> 社区交流-->
+<!--    </view>-->
+<!--    <navigator hover-class='none' url="/pages/coupon/index/index">-->
+<!--        <view class='action' style="font-size: 27rpx;"> 更多 <view class='icon-right'></view>-->
+<!--        </view>-->
+<!--    </navigator>-->
+<!--</view>-->
+<!--<view class="cu-list menu menu-avatar">-->
+<!--    <view class="cu-item " wx:for="{{postInfo}}" bindtap='postDetail' data-postId='{{ item.id }}'>-->
+<!--        <view class="cu-avatar radius lg"-->
+<!--            style="background-image:url(http://127.0.0.1:9527/imagesWeb/{{ item.image }});"></view>-->
+<!--        <view class='content'>-->
+<!--            <view class="text-titile">{{ item.title }}</view>-->
+<!--            <view class='text-gray text-sm'>{{ item.content }}</view>-->
+<!--        </view>-->
+<!--        <view class='action'>-->
+<!--            <view class='text-grey text-xs'>{{ item.days }}</view>-->
+<!--        </view>-->
+<!--    </view>-->
+<!--</view>-->
 
 <!--设计师-->
 <!-- <view class="cu-bar bg-white solid-bottom margin-top">

@@ -4,11 +4,14 @@ package cc.mrbird.febs.cos.controller;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.StaffInfo;
 import cc.mrbird.febs.cos.service.IStaffInfoService;
+import cc.mrbird.febs.system.service.UserService;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,6 +23,8 @@ import java.util.List;
 public class StaffInfoController {
 
     private final IStaffInfoService staffInfoService;
+
+    private final UserService userService;
 
     /**
      * 分页获取员工信息
@@ -71,8 +76,12 @@ public class StaffInfoController {
      * @return 结果
      */
     @PostMapping
-    public R save(StaffInfo staffInfo) {
-        return R.ok(staffInfoService.save(staffInfo));
+    public R save(StaffInfo staffInfo) throws Exception {
+        staffInfo.setCode("STF-" + System.currentTimeMillis());
+        staffInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        staffInfoService.save(staffInfo);
+        userService.registStaff(staffInfo);
+        return R.ok(true);
     }
 
     /**

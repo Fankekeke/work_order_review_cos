@@ -111,9 +111,24 @@ public class StaffInfo implements Serializable {
      */
     private Integer positionId;
 
+    /**
+     * 用户ID
+     */
+    private Integer userId;
+
+    /**
+     * 微信ID
+     */
+    private String openId;
+
     @TableField(exist = false)
     private String positionName;
 
     @TableField(exist = false)
     private String deptName;
+
+    @TableField(exist = false)
+    private String userName;
+    @TableField(exist = false)
+    private String avatar;
 }
