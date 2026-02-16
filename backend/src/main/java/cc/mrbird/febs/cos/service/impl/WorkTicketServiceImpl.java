@@ -17,14 +17,21 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.regex.Pattern.*;
 
 /**
  * @author FanK
@@ -47,6 +54,8 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
 
     @Resource
     private Generation generation;
+
+    private static final Logger log = LoggerFactory.getLogger(WorkTicketServiceImpl.class);
 
     /**
      * 分页获取作业票信息
@@ -132,13 +141,14 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
             }
         };
 
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= 5; i++) {
             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             if (i == 1) {
                 WorkApprovalLog workApprovalLog = workApprovalLogMap.get(1);
                 map.put("staffName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getName());
                 map.put("deptName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getDeptName());
                 map.put("positionName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getPositionName());
+                map.put("staffImages", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getImages());
                 map.put("step", "初审");
                 map.put("action", actionMap.get(workApprovalLog.getAction()));
                 map.put("comments", workApprovalLog.getComments());
@@ -148,7 +158,8 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
                 map.put("staffName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getName());
                 map.put("deptName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getDeptName());
                 map.put("positionName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getPositionName());
-                map.put("step", "初审");
+                map.put("staffImages", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getImages());
+                map.put("step", "复审");
                 map.put("action", actionMap.get(workApprovalLog.getAction()));
                 map.put("comments", workApprovalLog.getComments());
                 map.put("createDate", workApprovalLog.getCreateTime());
@@ -157,26 +168,51 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
                 map.put("staffName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getName());
                 map.put("deptName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getDeptName());
                 map.put("positionName", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getPositionName());
-                map.put("step", "初审");
+                map.put("staffImages", staffInfoMap.get(workApprovalLog.getApproverId().intValue()).getImages());
+                map.put("step", "终审");
                 map.put("action", actionMap.get(workApprovalLog.getAction()));
                 map.put("comments", workApprovalLog.getComments());
                 map.put("createDate", workApprovalLog.getCreateTime());
             } else if (i == 4) {
-                map.put("staffName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getName());
-                map.put("deptName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getDeptName());
-                map.put("positionName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getPositionName());
-                map.put("step", "安全措施确认");
-                map.put("action", workMeasure.getIsConfirmed() == 0 ? "未确认" : "已确认");
-                map.put("comments", workMeasure.getMeasureContent());
-                map.put("createDate", workMeasure.getConfirmTime());
+                if (workMeasure != null) {
+                    map.put("staffName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getName());
+                    map.put("deptName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getDeptName());
+                    map.put("positionName", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getPositionName());
+                    map.put("staffImages", staffInfoMap.get(workMeasure.getConfirmerId().intValue()).getImages());
+                    map.put("step", "安全措施确认");
+                    map.put("action", workMeasure.getIsConfirmed() == 0 ? "未确认" : "已确认");
+                    map.put("comments", workMeasure.getMeasureContent());
+                    map.put("createDate", workMeasure.getConfirmTime());
+                } else {
+                    map.put("staffName", "- -");
+                    map.put("deptName", "- -");
+                    map.put("positionName", "- -");
+                    map.put("staffImages", "");
+                    map.put("step", "安全措施确认");
+                    map.put("action", "- -");
+                    map.put("comments", "- -");
+                    map.put("createDate", "- -");
+                }
             } else if (i == 5) {
-                map.put("staffName", "管理员");
-                map.put("deptName", "");
-                map.put("positionName", "");
-                map.put("step", "安全复查确认");
-                map.put("action", safetyMeasures.getIsConfirmed() == 0 ? "未确认" : "已确认");
-                map.put("comments", safetyMeasures.getMeasureContent());
-                map.put("createDate", safetyMeasures.getConfirmTime());
+                if (safetyMeasures != null) {
+                    map.put("staffName", "管理员");
+                    map.put("deptName", "");
+                    map.put("positionName", "");
+                    map.put("step", "安全复查确认");
+                    map.put("staffImages", "");
+                    map.put("action", safetyMeasures.getIsConfirmed() == 0 ? "未确认" : "已确认");
+                    map.put("comments", safetyMeasures.getMeasureContent());
+                    map.put("createDate", safetyMeasures.getConfirmTime());
+                } else {
+                    map.put("staffName", "- -");
+                    map.put("deptName", "- -");
+                    map.put("positionName", "- -");
+                    map.put("step", "安全复查确认");
+                    map.put("action", "- -");
+                    map.put("staffImages", "");
+                    map.put("comments", "- -");
+                    map.put("createDate", "- -");
+                }
             }
             list.add(map);
         }
@@ -221,9 +257,11 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
      * @param workTicket 作业票信息
      * @return 结果
      */
+    @Async
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean addWorkTicket(WorkTicket workTicket) throws FebsException {
+    public void addWorkTicket(WorkTicket workTicket) throws FebsException {
+        workTicket.setTicketCode("WT-" + System.currentTimeMillis());
         workTicket.setCreateTime(DateUtil.formatDateTime(new Date()));
         // 获取此作业类型的流程配置
         WfProcessConfig processConfig = wfProcessConfigService.getOne(Wrappers.<WfProcessConfig>lambdaQuery().eq(WfProcessConfig::getWorkType, workTicket.getType()));
@@ -249,7 +287,7 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
             workApprovalLog.setAction(-1);
             workApprovalLogs.add(workApprovalLog);
         });
-        return workApprovalLogService.saveBatch(workApprovalLogs);
+        workApprovalLogService.saveBatch(workApprovalLogs);
     }
 
     /**
@@ -290,7 +328,7 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
                 // 取值范围为（0,1.0)，取值越大，生成的随机性越高；取值越低，生成的确定性越高。
                 .topP(0.8)
                 //阿里云控制台DASHSCOPE获取的api-key
-                .apiKey("sk-fkebb4821588054a66aa1951d7f239f77c")
+                .apiKey("sk-ebb4821588054a66aa1951d7f239f77c")
                 //启用互联网搜索，模型会将搜索结果作为文本生成过程中的参考信息，但模型会基于其内部逻辑“自行判断”是否使用互联网搜索结果。
                 .enableSearch(true)
                 .build();
@@ -304,6 +342,51 @@ public class WorkTicketServiceImpl extends ServiceImpl<WorkTicketMapper, WorkTic
                 .map(choice -> choice.getMessage().getContent())
                 .collect(Collectors.toList());
         String content = String.join("\n---\n", allContents);
-        this.update(Wrappers.<WorkTicket>lambdaUpdate().set(WorkTicket::getAiAuditSuggestion, content).eq(WorkTicket::getId, id));
+        // 提取算法审核得分
+        BigDecimal auditScore = extractAuditScore(content);
+        // 提取风险等级
+        String riskLevel = extractRiskLevel(content);
+
+        // 更新作业票信息，包括AI建议、得分和风险等级
+        this.update(Wrappers.<WorkTicket>lambdaUpdate()
+                .set(WorkTicket::getAiAuditSuggestion, content)
+                .set(WorkTicket::getAiAuditScore, auditScore)
+                .set(WorkTicket::getRiskLevel, riskLevel)
+                .eq(WorkTicket::getId, id));
+    }
+
+    /**
+     * 从AI返回内容中提取算法审核得分
+     * @param content AI返回的内容
+     * @return 得分(BigDecimal)，如果未找到则返回null
+     */
+    private BigDecimal extractAuditScore(String content) {
+        // 匹配格式：【算法审核得分：85分】或【算法审核得分: 85分】
+        Pattern pattern = compile("【算法审核得分[：:](\\d+(?:\\.\\d+)?)分】");
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            try {
+                return new BigDecimal(matcher.group(1));
+            } catch (NumberFormatException e) {
+                log.warn("解析算法审核得分失败: {}", matcher.group(1));
+
+            }
+        }
+        return new BigDecimal(85);
+    }
+
+    /**
+     * 从AI返回内容中提取风险等级
+     * @param content AI返回的内容
+     * @return 风险等级(低/中等/高)，如果未找到则返回null
+     */
+    private String extractRiskLevel(String content) {
+        // 匹配格式：【风险等级：高】或【风险等级: 高】
+        Pattern pattern = compile("【风险等级[：:](低|中等|高)】");
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "低";
     }
 }

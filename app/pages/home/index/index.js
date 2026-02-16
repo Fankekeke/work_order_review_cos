@@ -70,9 +70,13 @@ Page({
         showWorkTypePicker: false,
         showStartTimePicker: false,
         showEndTimePicker: false,
+        showEndTimePicker: false,
+        libraryList: [], // 规则库列表
+        matchedRules: [], // 匹配到的规则
+        currentTime: new Date().getTime()
     },
     onLoad: function () {
-        this.home()
+        this.queryLibraryKeyword()
     },
     onShow() {
         wx.getStorage({
@@ -87,8 +91,56 @@ Page({
             }
         })
     },
+    queryLibraryKeyword(key) {
+        http.get('queryLibraryAll').then((r) => {
+            this.setData({libraryList: r.data})
+        })
+    },
+    // 检测作业内容中的关键字
+    checkKeywords(workContent) {
+        const {libraryList} = this.data;
+        let matchedRules = [];
+
+        if (!workContent || !libraryList || libraryList.length === 0) {
+            this.setData({matchedRules: []});
+            return;
+        }
+
+        // 遍历规则库
+        libraryList.forEach(rule => {
+            if (rule.isActive !== 1) return; // 只检查激活的规则
+
+            const keywords = rule.keyword.split(',').map(k => k.trim());
+            console.log(keywords)
+            let isMatched = false;
+
+            // 检查每个关键字是否在作业内容中
+            for (let keyword of keywords) {
+                if (keyword && workContent.includes(keyword)) {
+                    isMatched = true;
+                    break;
+                }
+            }
+
+            if (isMatched) {
+                matchedRules.push({
+                    ruleName: rule.ruleName,
+                    mandatoryMeasure: rule.mandatoryMeasure,
+                    riskWarning: rule.riskWarning
+                });
+            }
+        });
+
+        this.setData({matchedRules: matchedRules});
+    },
+    onWorkContentChange(event) {
+        const workContent = event.detail;
+        this.setData({workContent: workContent});
+        // 实时检测关键字
+        this.checkKeywords(workContent);
+    },
     selectWorkType() {
-        this.setData({ showWorkTypePicker: true });
+        this.setData({showWorkTypePicker: true});
     },
     onConfirmWorkType(event) {
         this.setData({
@@ -97,47 +149,165 @@ Page({
         });
     },
     onCloseWorkTypePicker() {
-        this.setData({ showWorkTypePicker: false });
+        this.setData({showWorkTypePicker: false});
     },
-    onWorkContentChange(event) {
-        this.setData({ workContent: event.detail.value });
-    },
+    // onWorkContentChange(event) {
+    //     this.setData({ workContent: event.detail.value });
+    // },
     onLocationChange(event) {
-        this.setData({ location: event.detail.value });
+        this.setData({location: event.detail});
     },
     selectStartTime() {
-        this.setData({ showStartTimePicker: true });
+        this.setData({showStartTimePicker: true});
     },
     onConfirmStartTime(event) {
+        const selectedTime = event.detail;
         this.setData({
-            startTime: event.detail,
+            startTime: this.formatDateTime(selectedTime),
             showStartTimePicker: false
         });
+        // 如果结束时间早于开始时间，则清空结束时间
+        if (this.data.endTime && new Date(this.data.endTime) < new Date(selectedTime)) {
+            this.setData({
+                endTime: ''
+            });
+        }
     },
     onCloseStartTimePicker() {
-        this.setData({ showStartTimePicker: false });
+        this.setData({showStartTimePicker: false});
     },
     selectEndTime() {
-        this.setData({ showEndTimePicker: true });
+        this.setData({showEndTimePicker: true});
     },
     onConfirmEndTime(event) {
         this.setData({
-            endTime: event.detail,
+            endTime: this.formatDateTime(event.detail),
             showEndTimePicker: false
         });
     },
     onCloseEndTimePicker() {
-        this.setData({ showEndTimePicker: false });
+        this.setData({showEndTimePicker: false});
+    },
+    // 添加时间格式化函数
+    formatDateTime(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
     submit() {
-        // 提交表单逻辑
-        console.log('提交数据:', {
-            workType: this.data.workType,
-            workContent: this.data.workContent,
-            location: this.data.location,
-            startTime: this.data.startTime,
-            endTime: this.data.endTime
-        });
+        wx.getStorage({
+            key: 'userInfo',
+            success: (res) => {
+                this.setData({
+                    userInfo: res.data
+                })
+                // 表单校验
+                if (!this.data.workType) {
+                    wx.showToast({
+                        title: '请选择作业类型',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                if (!this.data.workContent.trim()) {
+                    wx.showToast({
+                        title: '请输入作业内容描述',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                if (!this.data.location.trim()) {
+                    wx.showToast({
+                        title: '请输入作业地点',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                if (!this.data.startTime) {
+                    wx.showToast({
+                        title: '请选择计划开始时间',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                if (!this.data.endTime) {
+                    wx.showToast({
+                        title: '请选择计划结束时间',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                // 时间合理性校验
+                const startDate = new Date(this.data.startTime.replace(/-/g, '/'));
+                const endDate = new Date(this.data.endTime.replace(/-/g, '/'));
+
+                if (startDate >= endDate) {
+                    wx.showToast({
+                        title: '结束时间必须晚于开始时间',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                    return;
+                }
+
+                // 提交表单逻辑
+                console.log('提交数据:', {
+                    applicantId: res.data.id,
+                    type: this.data.workType,
+                    workContent: this.data.workContent,
+                    location: this.data.location,
+                    startTime: this.data.startTime,
+                    endTime: this.data.endTime
+                });
+                let params = {
+                    applicantId: res.data.id,
+                    type: this.data.workType,
+                    workContent: this.data.workContent,
+                    location: this.data.location,
+                    startTime: this.data.startTime,
+                    endTime: this.data.endTime
+                }
+                http.post('saveWorkTicket', params).then((r) => {
+                    // 这里添加实际的提交逻辑
+                    wx.showToast({
+                        title: '提交成功',
+                        icon: 'success',
+                        duration: 2000
+                    });
+                    // 提交成功后清空表单
+                    this.setData({
+                        workType: '',
+                        workContent: '',
+                        location: '',
+                        startTime: '',
+                        endTime: '',
+                        matchedRules: [] // 同时清空匹配的规则
+                    });
+                })
+            },
+            fail: res => {
+                wx.showToast({
+                    title: '请先进行登录',
+                    icon: 'none',
+                    duration: 2000
+                })
+            }
+        })
     },
     /**
      * 选择位置

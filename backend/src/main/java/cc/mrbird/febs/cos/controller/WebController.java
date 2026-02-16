@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.utils.GpsCoordinateUtils;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.service.*;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -39,6 +41,10 @@ public class WebController {
     private final IBulletinInfoService bulletinInfoService;
 
     private final IStaffInfoService staffInfoService;
+
+    private final IAuditRuleLibraryService auditRuleLibraryService;
+
+    private final IWorkTicketService workTicketService;
 
     /**
      * File 转MultipartFile
@@ -107,7 +113,7 @@ public class WebController {
 //            MultipartFile cMultiFile = new MockMultipartFile("file", file.getName(), null, new FileInputStream(file));
 //
             // 1定义要上传文件 的存放路径
-            String localPath = "G:/Project/20250227校园快递配送系统/db";
+            String localPath = "G:/Project/20260212基于规则引擎的作业票智能审核小程序/db";
             // 2获得文件名字
             String fileName = multipartFile.getName();
             // 2上传失败提示
@@ -226,4 +232,44 @@ public class WebController {
         return R.ok(bulletinInfoService.getById(id));
     }
 
+    /**
+     * 获取审核规则信息列表
+     *
+     * @param keyword 关键词
+     * @return 结果
+     */
+    @GetMapping("/queryLibraryKeyword")
+    public R queryLibraryKeyword(String keyword) {
+        List<AuditRuleLibrary> list = auditRuleLibraryService.list(Wrappers.<AuditRuleLibrary>lambdaQuery().eq(AuditRuleLibrary::getIsActive, 1));
+        if (CollectionUtil.isEmpty(list)) {
+            return R.ok(Collections.emptyList());
+        }
+        List<AuditRuleLibrary> result = list.stream()
+                .filter(rule -> rule.getRuleName().contains(keyword))
+                .collect(Collectors.toList());
+        // 返回结果
+        return R.ok(result);
+    }
+
+    /**
+     * 获取审核规则信息列表
+     *
+     * @return 列表
+     */
+    @GetMapping("/queryLibraryAll")
+    public R queryLibraryAll() {
+        return R.ok(auditRuleLibraryService.list(Wrappers.<AuditRuleLibrary>lambdaQuery().eq(AuditRuleLibrary::getIsActive, 1)));
+    }
+
+    /**
+     * 新增作业票信息
+     *
+     * @param workTicket 作业票信息
+     * @return 结果
+     */
+    @PostMapping("/saveWorkTicket")
+    public R saveWorkTicket(@RequestBody WorkTicket workTicket) throws FebsException {
+        workTicketService.addWorkTicket(workTicket);
+        return R.ok(true);
+    }
 }

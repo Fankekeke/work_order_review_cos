@@ -96,7 +96,8 @@ public class WorkTicketController {
      */
     @PostMapping
     public R save(WorkTicket workTicket) throws FebsException {
-        return R.ok(workTicketService.addWorkTicket(workTicket));
+        workTicketService.addWorkTicket(workTicket);
+        return R.ok(true);
     }
 
     /**

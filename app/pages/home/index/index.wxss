@@ -144,3 +144,74 @@ page {
 .canui-order-item .order-btn-box .margin-tb-sm + .margin-tb-sm{
     margin-left: 10rpx;
 }
+.large-input-field {
+    height: 100rpx !important;
+}
+
+.large-input-field .van-field__control {
+    min-height: 100rpx !important;
+    line-height: 100rpx !important;
+}
+
+/* 关键字匹配警告样式 */
+.warning-container {
+    margin: 20rpx 24rpx;
+    padding: 20rpx;
+    background-color: #fffbe6;
+    border: 2rpx solid #ffe58f;
+    border-radius: 10rpx;
+}
+
+.warning-item {
+    margin-bottom: 20rpx;
+}
+
+.warning-item:last-child {
+    margin-bottom: 0;
+}
+
+.warning-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10rpx;
+}
+
+.warning-icon {
+    font-size: 32rpx;
+    margin-right: 10rpx;
+}
+
+.rule-name {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #d46b08;
+}
+
+.risk-warning {
+    margin-bottom: 15rpx;
+}
+
+.warning-text {
+    font-size: 26rpx;
+    color: #cf1322;
+    font-weight: 500;
+}
+
+.mandatory-measure {
+    background-color: #fff2e8;
+    padding: 15rpx;
+    border-radius: 8rpx;
+    border-left: 6rpx solid #fa8c16;
+}
+
+.measure-label {
+    font-size: 24rpx;
+    color: #fa8c16;
+    font-weight: bold;
+}
+
+.measure-content {
+    font-size: 24rpx;
+    color: #595959;
+    margin-left: 10rpx;
+}

@@ -31,7 +31,7 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
+<!--        <a-button type="primary" ghost @click="add">新增</a-button>-->
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -68,10 +68,15 @@
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="eye" theme="twoTone" twoToneColor="#1890ff" @click="viewDetail(record)" title="查看详情" style="margin-right: 8px;"></a-icon>
+<!--          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>-->
         </template>
       </a-table>
     </div>
+    <work-ticket-detail @close="handleViewClose"
+                        v-if="ticketView.visiable"
+                        :ticketShow="ticketView.visiable"
+                        :ticketData="ticketView.data"/>
   </a-card>
 </template>
 
@@ -79,13 +84,18 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import {mapState} from 'vuex'
 import moment from 'moment'
+import WorkTicketDetail from './WorkTicketView.vue'
 moment.locale('zh-cn')
 
 export default {
   name: 'Bulletin',
-  components: {RangeDate},
+  components: {WorkTicketDetail, RangeDate},
   data () {
     return {
+      ticketView: {
+        visiable: false,
+        data: null
+      },
       advanced: false,
       bulletinAdd: {
         visiable: false
@@ -117,14 +127,9 @@ export default {
     }),
     columns () {
       return [{
-        title: '作业名称',
-        dataIndex: 'workName'
-      }, {
         title: '作业类型',
-        dataIndex: 'workType'
-      }, {
-        title: '创建时间',
-        dataIndex: 'createDate',
+        dataIndex: 'type',
+        ellipsis: true,
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -133,11 +138,155 @@ export default {
           }
         }
       }, {
-        title: '审核人员',
-        dataIndex: 'auditUsers',
+        title: '风险等级',
+        dataIndex: 'riskLevel',
+        ellipsis: true,
         customRender: (text, row, index) => {
-          if (text && text.length > 0) {
-            return text.map(user => user.staffName).join(', ')
+          if (text !== null) {
+            // 根据风险等级显示不同颜色
+            let color = 'blue'
+            if (text === '高') color = 'red'
+            else if (text === '中') color = 'orange'
+            else if (text === '低') color = 'green'
+            return <a-tag color={color}>{text}</a-tag>
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '作业内容',
+        dataIndex: 'workContent',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null && text.length > 20) {
+            return <a-tooltip title={text}>{text.substring(0, 20)}...</a-tooltip>
+          } else if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '作业地点',
+        dataIndex: 'location',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '申请人',
+        dataIndex: 'staffName',
+        customRender: (text, record, index) => {
+          if (!text) return '- -'
+          return (
+            <div style="display: flex; align-items: center;">
+              <a-avatar
+                size="72"
+                src={ record.staffImages ? 'http://127.0.0.1:9527/imagesWeb/' + record.staffImages : null }
+                icon={ record.staffImages ? null : 'user' }
+                style="margin-right: 15px;"
+              />
+              <div>
+                <div>{text}</div>
+                <div style="color: #999; font-size: 12px;margin-top: 5px">{record.deptName}</div>
+                <div style="color: #777; font-size: 12px;margin-top: 5px">{record.positionName}</div>
+              </div>
+            </div>
+          )
+        },
+        width: 200
+      }, {
+        title: '开始时间',
+        dataIndex: 'startTime',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '结束时间',
+        dataIndex: 'endTime',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: 'AI审核分数',
+        dataIndex: 'aiAuditScore',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            // 根据分数显示不同颜色
+            let color = 'blue'
+            if (text >= 90) color = 'green'
+            else if (text >= 70) color = 'orange'
+            else color = 'red'
+            return <a-tag color={color}>{text}分</a-tag>
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '状态',
+        dataIndex: 'status',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            // 1:正在初审, 2:正在复审, 3:正在终审, 4:已驳回 5:安全措施 6:措施落实
+            let statusText = ''
+            let statusColor = ''
+            switch (text) {
+              case 1:
+                statusText = '正在初审'
+                statusColor = 'orange'
+                break
+              case 2:
+                statusText = '正在复审'
+                statusColor = 'blue'
+                break
+              case 3:
+                statusText = '正在终审'
+                statusColor = 'purple'
+                break
+              case 4:
+                statusText = '已驳回'
+                statusColor = 'red'
+                break
+              case 5:
+                statusText = '安全措施'
+                statusColor = 'gold'
+                break
+              case 6:
+                statusText = '措施落实'
+                statusColor = 'green'
+                break
+              default:
+                statusText = '未知'
+                statusColor = 'gray'
+            }
+            return <a-tag color={statusColor}>{statusText}</a-tag>
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '创建时间',
+        dataIndex: 'createTime',
+        ellipsis: true,
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
           } else {
             return '- -'
           }
@@ -153,38 +302,20 @@ export default {
     this.fetch()
   },
   methods: {
-
-    expandedRowRender(record) {
+    handleViewClose () {
+      this.ticketView.visiable = false
+    },
+    viewDetail (record) {
+      this.ticketView.data = record
+      this.ticketView.visiable = true
+    },
+    expandedRowRender (record) {
       return (
         <div>
-          <h4>审批人信息：</h4>
-          {record.auditUsers && record.auditUsers.length > 0 ? (
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 16px; overflow-x: auto;">
-              {record.auditUsers.map((item) => (
-                <div key={item.userId} style="display: flex; align-items: center; padding: 8px; border: 1px solid #e8e8e8; border-radius: 4px; min-width: 200px;">
-                  <a-avatar
-                    src={item.staffImages ? `http://127.0.0.1:9527/imagesWeb/${item.staffImages}` : '/default-avatar.png'}
-                    size="large"
-                    style="margin-right: 12px;"
-                  />
-                  <div>
-                    <div style="white-space: nowrap;">
-                      <span><strong>姓名：</strong>{item.staffName}</span>
-                      <span style="margin-left: 20px"><strong>部门：</strong>{item.deptName}</span>
-                    </div>
-                    <div style="white-space: nowrap;">
-                      <span><strong>职位：</strong>{item.positionName}</span>
-                      <span style="margin-left: 20px"><strong>角色：</strong>{item.roleKey}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>暂无审批人信息</p>
-          )}
+          <h4>作业详细内容：</h4>
+          {record.workContent}
         </div>
-      );
+      )
     },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
@@ -230,7 +361,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/wf-process-config/' + ids).then(() => {
+          that.$delete('/cos/work-ticket/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -300,7 +431,7 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      this.$get('/cos/wf-process-config/page', {
+      this.$get('/cos/work-ticket/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

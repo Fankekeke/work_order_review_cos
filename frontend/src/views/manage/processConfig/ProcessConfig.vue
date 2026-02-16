@@ -173,9 +173,9 @@ export default {
         <div>
           <h4>审批人信息：</h4>
           {record.auditUsers && record.auditUsers.length > 0 ? (
-            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 16px; overflow-x: auto;">
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 16px; overflow-x: auto;width: 100%">
               {record.auditUsers.map((item) => (
-                <div key={item.userId} style="display: flex; align-items: center; padding: 8px; border: 1px solid #e8e8e8; border-radius: 4px; min-width: 200px;">
+                <div key={item.userId} style="display: flex; align-items: center; padding: 15px; border: 1px solid #e8e8e8; border-radius: 4px; min-width: 200px;">
                   <a-avatar
                     src={item.staffImages ? `http://127.0.0.1:9527/imagesWeb/${item.staffImages}` : '/default-avatar.png'}
                     size="large"
@@ -186,7 +186,7 @@ export default {
                       <span><strong>姓名：</strong>{item.staffName}</span>
                       <span style="margin-left: 20px"><strong>部门：</strong>{item.deptName}</span>
                     </div>
-                    <div style="white-space: nowrap;">
+                    <div style="white-space: nowrap;margin-top: 15px">
                       <span><strong>职位：</strong>{item.positionName}</span>
                       <span style="margin-left: 20px"><strong>角色：</strong>{item.roleKey}</span>
                     </div>

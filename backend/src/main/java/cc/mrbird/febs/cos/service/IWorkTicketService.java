@@ -53,5 +53,5 @@ public interface IWorkTicketService extends IService<WorkTicket> {
      * @param workTicket 作业票信息
      * @return 结果
      */
-    boolean addWorkTicket(WorkTicket workTicket) throws FebsException;
+    void addWorkTicket(WorkTicket workTicket) throws FebsException;
 }
