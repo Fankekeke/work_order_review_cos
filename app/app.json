@@ -25,7 +25,10 @@
     "pages/user/audit/index",
     "pages/user/goods/index",
     "pages/check/index/index",
-    "pages/user/messageDetail/index"
+    "pages/user/messageDetail/index",
+    "pages/workorder/detail/index",
+    "pages/workorder/edit/index",
+    "pages/workorder/safety/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#39b54a",

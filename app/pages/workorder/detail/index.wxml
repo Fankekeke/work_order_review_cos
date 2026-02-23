@@ -1,0 +1,120 @@
+
+<!-- 状态栏区域 -->
+<view class="cu-custom" style="height:{{CustomBar}}px;">
+    <view class="cu-bar fixed none-bg text-white bg-img" style="height:{{CustomBar}}px;padding-top:{{StatusBar}}px;">
+        <navigator class='action canui-head-title' open-type="navigateBack" hover-class="none">
+            <text class='icon-back'></text>
+            作业单详情
+        </navigator>
+    </view>
+</view>
+
+<view class="box" style="top: {{CustomBar}}px;">
+    <!-- 作业单基本信息 -->
+    <view class="work-order-basic-info bg-white margin-top">
+        <view class="info-header">
+            <view class="ticket-code">
+                <text class="label">作业票编号:</text>
+                <text class="value">{{ ticketInfo.ticketCode }}</text>
+            </view>
+            <view class="work-type">
+                <text class="label">作业类型:</text>
+                <text class="value">{{ ticketInfo.type }}</text>
+            </view>
+        </view>
+
+        <view class="status-section">
+            <view class="status-badge status-pending" wx:if="{{ item.status == 1 }}">正在初审</view>
+            <view class="status-badge status-processing" wx:elif="{{ item.status == 2 }}">正在复审</view>
+            <view class="status-badge status-approved" wx:elif="{{ item.status == 3 }}">正在终审</view>
+            <view class="status-badge status-rejected" wx:elif="{{ item.status == 4 }}">已驳回</view>
+            <view class="status-badge status-completed" wx:elif="{{ item.status == 5 }}">安全措施</view>
+            <view class="status-badge status-cancelled" wx:else>措施落实</view>
+        </view>
+
+        <view class="applicant-info">
+            <view class="cu-avatar radius lg" style="background-image:url(http://127.0.0.1:9527/imagesWeb/{{ ticketInfo.staffImages }});"></view>
+            <view class="applicant-details">
+                <view class="applicant-name">{{ ticketInfo.staffName }}</view>
+                <view class="applicant-position">{{ ticketInfo.deptName }} - {{ ticketInfo.positionName }}</view>
+            </view>
+        </view>
+    </view>
+
+    <!-- 作业内容详情 -->
+    <view class="work-content-section bg-white margin-top">
+        <view class="section-title">作业内容</view>
+        <view class="content-text">{{ ticketInfo.workContent }}</view>
+    </view>
+
+    <!-- 作业地点和时间 -->
+    <view class="location-time-section bg-white margin-top">
+        <view class="section-title">作业信息</view>
+        <view class="info-grid">
+            <view class="info-item">
+                <text class="label">作业地点:</text>
+                <text class="value">{{ ticketInfo.location }}</text>
+            </view>
+            <view class="info-item">
+                <text class="label">开始时间:</text>
+                <text class="value">{{ ticketInfo.startTime }}</text>
+            </view>
+            <view class="info-item">
+                <text class="label">结束时间:</text>
+                <text class="value">{{ ticketInfo.endTime }}</text>
+            </view>
+        </view>
+    </view>
+
+    <!-- 风险评估和AI审核 -->
+    <view class="risk-ai-section bg-white margin-top">
+        <view class="section-title">风险评估</view>
+        <view class="risk-info">
+            <view class="risk-level">
+                <text class="label">风险等级:</text>
+                <view class="risk-badge risk-high" wx:if="{{ ticketInfo.riskLevel == '高' }}">高风险</view>
+                <view class="risk-badge risk-medium" wx:elif="{{ ticketInfo.riskLevel == '中' }}">中风险</view>
+                <view class="risk-badge risk-low" wx:else>低风险</view>
+            </view>
+            <view class="ai-score">
+                <text class="label">AI审核评分:</text>
+                <text class="value">{{ ticketInfo.aiAuditScore }}分</text>
+            </view>
+        </view>
+        <view class="ai-suggestion" wx:if="{{ ticketInfo.aiAuditSuggestion }}">
+            <text class="label">AI审核建议:</text>
+            <view class="suggestion-content">{{ ticketInfo.aiAuditSuggestion }}</view>
+        </view>
+    </view>
+
+    <!-- 审批记录 -->
+    <view class="approval-record-section bg-white margin-top">
+        <view class="section-title">审批记录</view>
+        <view class="approval-list">
+            <view wx:for="{{ ticketDetail }}" wx:key="index" class="approval-item {{ item.action == '通过' ? 'approved' : item.action == '未确认' || item.action == '未处理' ? 'pending' : 'rejected' }}">
+                <view class="approval-header">
+                    <view class="approver-info">
+                        <view class="cu-avatar radius sm" style="background-image:url(http://127.0.0.1:9527/imagesWeb/{{ item.staffImages }});"></view>
+                        <view class="approver-details">
+                            <view class="approver-name">{{ item.staffName }}</view>
+                            <view class="approver-position">{{ item.deptName }} - {{ item.positionName }}</view>
+                        </view>
+                    </view>
+                    <view class="approval-status">
+                        <view class="status-badge small approved" wx:if="{{ item.action == '通过' }}">通过</view>
+                        <view class="status-badge small pending" wx:elif="{{ item.action == '未确认' || item.action == '未处理' }}">待处理</view>
+                        <view class="status-badge small rejected" wx:else>{{ item.action }}</view>
+                    </view>
+                </view>
+                <view class="approval-step">{{ item.step }}</view>
+                <view class="approval-comments" wx:if="{{ item.comments && item.comments != '- -' }}">{{ item.comments }}</view>
+                <view class="approval-date" wx:if="{{ item.createDate && item.createDate != '- -' }}">{{ item.createDate }}</view>
+            </view>
+        </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{ !ticketInfo }}" class="empty-state">
+        <van-empty style="height: 400px;margin: 0 auto" description="无作业单信息" />
+    </view>
+</view>

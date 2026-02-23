@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "van-empty": "../../../dist/empty/index",
+    "van-uploader": "../../../dist/uploader/index"
+  }
+}

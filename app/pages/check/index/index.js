@@ -1,13 +1,14 @@
 const app = getApp();
 let http = require('../../../utils/request')
 var QQMapWX = require('../../../common/qqmap-wx-jssdk');
- 
+
 // 实例化API核心类
 var qqmapsdk = new QQMapWX({
-  key: 'DCOBZ-J5JRP-MITDA-VER54-WR43E-RLFLC' // 必填	
+  key: 'DCOBZ-J5JRP-MITDA-VER54-WR43E-RLFLC' // 必填
 });
 Page({
 	data: {
+		workOrderList: [],
 		StatusBar: app.globalData.StatusBar,
 		CustomBar: app.globalData.CustomBar,
 		hidden: true,
@@ -80,8 +81,7 @@ Page({
 				this.setData({
 					userInfo: res.data
 				})
-				this.home()
-				//this.setUserLocation()
+				this.loadWorkOrders()
 			},
 			fail: res => {
 				wx.showToast({
@@ -89,60 +89,6 @@ Page({
 					icon: 'none',
 					duration: 2000
 				})
-			}
-		})
-	},
-	withdrawal() {
-		console.log(this.data.staffData)
-		if (this.data.staffData.price <= 0) {
-			wx.showToast({
-				title: '当前余额不足',
-				icon: 'none',
-				duration: 2000
-			})
-			return false
-		}
-		wx.showModal({
-			title: '提示',
-			content: '是否要进行提现',
-			success: (res) => {
-				if (res.confirm) {
-					http.post('withdrawInfoAdd', {
-						staffId: this.data.userInfo.id
-					}).then((r) => {
-						wx.showToast({
-							title: '提现审核中...',
-							icon: 'none',
-							duration: 2000
-						})
-						setTimeout(() => {
-							this.home()
-						}, 1000);
-					})
-				} else if (res.cancel) {
-					console.log('用户点击取消')
-				}
-			}
-		})
-	},
-	/**
-	 * 选择位置
-	 */
-	startChooseLocation() {
-		const _this = this;
-		wx.chooseLocation({
-			success(res) {
-				console.log(res)
-				_this.setData({
-					['startPoint.startAddress']: res.address,
-					['startPoint.point']: {
-						latitude: res.latitude,
-						longitude: res.longitude
-					},
-				})
-			},
-			fail(e) {
-				console.log(e);
 			}
 		})
 	},
@@ -199,41 +145,41 @@ Page({
 				}
 				console.log(params)
 				http.get('addRealTimeLocation', params).then((r) => {
-					
+
 				})
 			}
 		})
 	},
-	home() {
-		let latitude = null;
-		let longitude = null;
-		let that = this
-		wx.getLocation({
-			type: 'wgs84',
-			success(res) {
-				console.log(res)
-				latitude = res.latitude
-				longitude = res.longitude
-				http.get('home/user', {
-					latitude,
-					longitude,
-					userId: that.data.userInfo.id
-				}).then((r) => {
-					r.orderList.forEach(item => {
-						if (item.images) {
-							item.image = item.images.split(',')[0]
-						}
-						item.days = that.timeFormat(item.createDate)
-					});
-					that.setData({
-						withdraw: r.withdraw,
-						staffData: r.staffInfo,
-						staffInfo: r.userInfo,
-						orderList: r.orderList
-					})
-				})
-			}
+	loadWorkOrders() {
+		http.get('/queryHomeWorkByUser', {
+			userId: this.data.userInfo.id
+		}).then((r) => {
+			this.setData({
+				workOrderList: r.data
+			})
 		})
 	},
+
+	viewDetail(e) {
+		const id = e.currentTarget.dataset.id;
+		wx.navigateTo({
+			url: '/pages/workorder/detail/index?id=' + id
+		})
+	},
+
+	editOrder(e) {
+		const id = e.currentTarget.dataset.id;
+		wx.navigateTo({
+			url: '/pages/workorder/edit/index?id=' + id
+		})
+	},
+
+	safetyOrder(e) {
+		const id = e.currentTarget.dataset.id;
+		wx.navigateTo({
+			url: '/pages/workorder/safety/index?id=' + id
+		})
+	}
+
 
 });
